@@ -19,20 +19,44 @@
 
 #include <curses.h>
 #include <unistd.h>
+//#include <linuxcnc/hal.h>
 
 // <><><><><><><><><><><><><>
 //      Window Variables
 // <><><><><><><><><><><><><>
-WINDOW *dro;
-WINDOW *editor;
-WINDOW *messages;
-WINDOW *status;
+WINDOW *w_dro;
+WINDOW *w_editor;
+WINDOW *w_messages;
+WINDOW *w_status;
 
 uint16_t mid_top_col, mid_bot_col;
 uint16_t mid_left_lines, mid_right_lines;
 
 // Global windows
 uint16_t max_h, max_w;
+
+// <><><><><><><><><><><><><>
+//      Linuxcnc Update Functions
+//  TODO Move to own file
+// <><><><><><><><><><><><><>
+void updateDRO(WINDOW *dro){
+  mvprintw(0,5  ,"Machine   Program   Offset");
+
+  mvprintw(1,1,"X:  %f  %f  %f",0.123,0.123,0.123);
+  mvprintw(2,1,"Y:  %f  %f  %f",0.123,0.123,0.123);
+  mvprintw(3,1,"Z:  %f  %f  %f",0.123,0.123,0.123);
+
+}
+
+
+
+void updateEditor(WINDOW *editor, int line){
+
+}
+
+void updateEditor(WINDOW *editor){
+  updateEditor(editor, 0);
+}
 
 // <><><><><><><><><><><><><>
 //      Main Function
@@ -56,29 +80,29 @@ int main() {
   mid_right_lines = max_h/2;
   mid_left_lines = max_h/2;
   refresh();
-  dro = newwin(mid_right_lines,mid_top_col, 0, 0);
-  editor = newwin(max_h-mid_right_lines, mid_bot_col, mid_right_lines, 0);
-  status = newwin(mid_left_lines, max_w-mid_top_col, 0, mid_top_col);
-  messages = newwin(max_h-mid_left_lines, max_w-mid_bot_col, mid_left_lines, mid_bot_col);
-  box(dro, 0 , 0);
-  box(editor, 0 , 0);
-  box(status, 0 , 0);
-  box(messages, 0 , 0);
-  keypad(dro, true);
+  w_dro = newwin(mid_right_lines, mid_top_col, 0, 0);
+  w_editor = newwin(max_h-mid_right_lines, mid_bot_col, mid_right_lines, 0);
+  w_status = newwin(mid_left_lines, max_w - mid_top_col, 0, mid_top_col);
+  w_messages = newwin(max_h - mid_left_lines, max_w - mid_bot_col, mid_left_lines, mid_bot_col);
+  box(w_dro, 0 , 0);
+  box(w_editor, 0 , 0);
+  box(w_status, 0 , 0);
+  box(w_messages, 0 , 0);
+  keypad(w_dro, true);
 
-  nodelay(dro, true);
-  nodelay(editor, true);
-  nodelay(status, true);
-  nodelay(messages, true);
+  nodelay(w_dro, true);
+  nodelay(w_editor, true);
+  nodelay(w_status, true);
+  nodelay(w_messages, true);
 
-  waddstr(dro,"X = 0.000\nY = 0.000\nZ = 0.000\n");
-  wrefresh(dro);
-  waddstr(editor, "Editor\n");
-  wrefresh(editor);
-  waddstr(status, "Status");
-  wrefresh(status);
-  waddstr(messages, "messages");
-  wrefresh(messages);
+  waddstr(w_dro, "DRO");
+  wrefresh(w_dro);
+  waddstr(w_editor, "Editor");
+  wrefresh(w_editor);
+  waddstr(w_status, "Status");
+  wrefresh(w_status);
+  waddstr(w_messages, "w_messages");
+  wrefresh(w_messages);
 
   int ch;
 
@@ -88,16 +112,13 @@ int main() {
  bool run = true;
   while(run){
     ch = getch();
-    if(ch == KEY_ENTER){
+    if(ch == 'q'){
       run = false;
     }
     else{
-      wprintw(dro, "Pressed Key is: " );
-      attron(A_BOLD);
-      wprintw(dro, "%c\n", ch);
-      attroff(A_BOLD);
+      updateDRO(w_dro);
     }
-    wrefresh(dro);
+    wrefresh(w_dro);
 
   }
   // Clean up
