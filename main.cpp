@@ -34,7 +34,10 @@ uint16_t mid_left_lines, mid_right_lines;
 // Global windows
 uint16_t max_h, max_w;
 
-
+// <><><><><><><><><><><><><>
+//      Main Function
+//  TODO Abstract all functions in here
+// <><><><><><><><><><><><><>
 int main() {
   // Initialization
   initscr();
@@ -42,6 +45,12 @@ int main() {
   noecho();
 
   getmaxyx(stdscr, max_h, max_w);
+  if(max_w < 80 || max_h < 10){
+    endwin();
+    printf("Terminal must be larger than 80 characters and 10 lines");
+    return -1;
+  }
+
   mid_top_col = max_w/2;
   mid_bot_col = max_w/2;
   mid_right_lines = max_h/2;
@@ -51,7 +60,10 @@ int main() {
   editor = newwin(max_h-mid_right_lines, mid_bot_col, mid_right_lines, 0);
   status = newwin(mid_left_lines, max_w-mid_top_col, 0, mid_top_col);
   messages = newwin(max_h-mid_left_lines, max_w-mid_bot_col, mid_left_lines, mid_bot_col);
-
+  box(dro, 0 , 0);
+  box(editor, 0 , 0);
+  box(status, 0 , 0);
+  box(messages, 0 , 0);
   keypad(dro, true);
 
   nodelay(dro, true);
@@ -70,6 +82,9 @@ int main() {
 
   int ch;
 
+// <><><><><><><><><><><><><>
+//      Main Loop
+// <><><><><><><><><><><><><>
  bool run = true;
   while(run){
     ch = getch();
@@ -86,7 +101,7 @@ int main() {
 
   }
   // Clean up
-  
+
   endwin();
   return 0;
 }
